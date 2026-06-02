@@ -32,7 +32,7 @@
     font-size: 20px;
     padding: 7px;
 }
-.recipe_results {
+.recipe_list {
     display: flex;
     padding: 20px;
     flex-flow: wrap;

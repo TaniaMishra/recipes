@@ -58,7 +58,7 @@ export default function Home() {
             <p className='separator'>&middot;</p>
             <p className='filter'>filter placeholder</p>
         </div>
-        <div className='recipe_results'>
+        <div className='recipe_list'>
             {loading ? 
                 (<p>Loading recipes...</p>)
                 : filteredRecipes.length > 0
