@@ -1,0 +1,26 @@
+.navbar {
+    display: flex;
+    gap: 40px;
+    font-size: 17px;
+    text-align: left;
+    /* padding: 10px; */
+    border-radius: 5px;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+    margin-bottom: 24px;
+}
+.nav_pages {
+    padding: 10px;
+}
+.nav_profile {
+    padding: 10px;
+
+}
+
+
+/* 
+  &:hover {
+    border-color: var(--accent-border);
+  } */
