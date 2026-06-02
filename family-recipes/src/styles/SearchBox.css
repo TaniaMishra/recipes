@@ -1,0 +1,11 @@
+.search_input {
+    display: flex;
+    width: 50%;
+    padding: 7px;
+    font-size: 25px;
+    color: var(--text);
+    border-radius: 5px;
+    border: 2px solid var(--accent-border);
+    transition: border-color 0.3s;
+    background-color: var(--accent-bg);
+}

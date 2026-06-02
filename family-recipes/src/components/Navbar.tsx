@@ -7,25 +7,25 @@ export default function Navbar() {
             <div className="navbar">
                 <div className="nav_pages">
                     <NavLink to="/"
-                        className={({ isActive }) => isActive ? "text-black font-semibold" : "hover:text-black"}>
+                        className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                             Family Recipes
                     </NavLink>
                     <NavLink to="/recipes"
-                        className={({ isActive }) => isActive ? "text-black font-semibold" : "hover:text-black"}>
+                        className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                             Recipes
                     </NavLink>
                     <NavLink to="/meal-plan"
-                        className={({ isActive }) => isActive ? "text-black font-semibold" : "hover:text-black"}>
+                        className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                             Meal Plan
                     </NavLink>
                     <NavLink to="/kitchen"
-                        className={({ isActive }) => isActive ? "text-black font-semibold" : "hover:text-black"}>
+                        className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                             My Kitchen
                     </NavLink>
                 </div>
                 <div className="nav_profile">
                     <NavLink to="/"
-                        className={({ isActive }) => isActive ? "text-black font-semibold" : "hover:text-black"}>
+                        className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                             Profile
                     </NavLink>
                 </div>
