@@ -1,8 +1,9 @@
-.recipe_card {
+.recipe {
     display: flex;
     flex-flow: column;
-    width: 30%;
-    padding: 2.5%;
+    margin: 5%;
+    margin-top: 15px;
+    width: 90%;
     color: var(--text);
     text-decoration: none;
     border-radius: 5px;

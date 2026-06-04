@@ -4,6 +4,7 @@ import { RecipeCard } from './RecipeCard';
 import { useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
+
 export default function Recipes() {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState<boolean>(true);

@@ -1,4 +1,6 @@
 import "../styles/RecipeCard.css"
+import { Link } from "react-router-dom";
+
 
 interface RecipeCardProps {
     recipe: Recipe;
@@ -6,7 +8,7 @@ interface RecipeCardProps {
 
 export function RecipeCard({ recipe }: RecipeCardProps) {
     return (
-        <div className='recipe_card'>
+        <Link className='recipe_card' to={`/recipes/${recipe.recipe_id}`}>
             <h2>{recipe.name}</h2>
             {recipe.tags 
             ? recipe.tags.map((tag) => (
@@ -14,6 +16,6 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
                 ))
             : <p>No tags</p>
             }
-        </div>
+        </Link>
     )
 }

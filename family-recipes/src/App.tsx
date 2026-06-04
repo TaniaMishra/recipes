@@ -12,7 +12,7 @@ import MealPlan from './components/MealPlan';
 import Profile from './components/Profile';
 import Login from './components/Login';
 import CreateUser from './components/CreateUser';
-
+import ViewRecipe from './components/ViewRecipe';
 
 function App() {
 
@@ -28,6 +28,8 @@ function App() {
         <Route path="/my-profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/create-account" element={<CreateUser />} />
+        <Route path="/recipes/:recipeID" element={<ViewRecipe />} />
+
       </Routes>
     </BrowserRouter>
   )
