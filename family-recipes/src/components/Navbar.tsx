@@ -8,7 +8,7 @@ export default function Navbar() {
                 <div className="nav_pages">
                     <NavLink to="/"
                         className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
-                            Family Recipes
+                            What's for dinner?
                     </NavLink>
                     <NavLink to="/recipes"
                         className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
@@ -24,7 +24,7 @@ export default function Navbar() {
                     </NavLink>
                 </div>
                 <div className="nav_profile">
-                    <NavLink to="/"
+                    <NavLink to="/my-profile"
                         className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                             Profile
                     </NavLink>

@@ -7,6 +7,11 @@ import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import Recipes from './components/Recipes';
 import AddRecipe from './components/AddRecipe';
+import Kitchen from './components/Kitchen';
+import MealPlan from './components/MealPlan';
+import Profile from './components/Profile';
+import Login from './components/Login';
+import CreateUser from './components/CreateUser';
 
 
 function App() {
@@ -17,9 +22,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/recipes" element={<Recipes />} />
-        <Route path="/meal-plan" element={<div>Meal Plan</div>} />
-        <Route path="/kitchen" element={<div>Kitchen</div>} />
+        <Route path="/meal-plan" element={<MealPlan />} />
+        <Route path="/kitchen" element={<Kitchen />} />
         <Route path="/add-recipe" element={<AddRecipe />} />
+        <Route path="/my-profile" element={<Profile />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/create-account" element={<CreateUser />} />
       </Routes>
     </BrowserRouter>
   )
