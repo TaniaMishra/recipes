@@ -11,6 +11,7 @@ export default function Home() {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
+    const [showResults, setShowResults] = useState<boolean>(false);
 
     useEffect(() => {
         async function fetchRecipes() {
@@ -30,7 +31,12 @@ export default function Home() {
 
 
     const handleSearch = (query: string) => {
-        setSearchQuery(query)
+        setSearchQuery(query);
+        if (query.trim() === "") {
+            setShowResults(false);
+        } else {
+            setShowResults(true)
+        }
     }
 
     // TO DO: advanced searches
@@ -59,13 +65,15 @@ export default function Home() {
             <p className='filter'>filter placeholder</p>
         </div>
         <div className='recipe_list'>
-            {loading ? 
-                (<p>Loading recipes...</p>)
-                : filteredRecipes.length > 0
-                    ? filteredRecipes.map((recipe) => (
-                        <RecipeCard recipe={recipe}  />
-                    ))
-                    : (<p>No recipes found matching "{searchQuery}"</p>)
+            {showResults ?
+                loading ? 
+                    (<p>Loading recipes...</p>)
+                    : filteredRecipes.length > 0
+                        ? filteredRecipes.map((recipe) => (
+                            <RecipeCard recipe={recipe}  />
+                        ))
+                        : (<p>No recipes found matching "{searchQuery}"</p>)
+                : <p>Search or filter to view results</p>
             }
         </div>
     </>
