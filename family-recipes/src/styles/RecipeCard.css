@@ -1,0 +1,13 @@
+.recipe_card {
+    display: flex;
+    flex-flow: column;
+    width: 25%;
+    padding: 2.5%;
+    margin: 7px;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 5px;
+    border: 2px solid var(--accent-border);
+    transition: border-color 0.3s;
+    background-color: var(--accent-bg);
+}

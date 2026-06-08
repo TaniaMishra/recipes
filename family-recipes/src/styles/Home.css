@@ -1,0 +1,45 @@
+.search_heading {
+    margin-top: 5%;
+}
+.search_box {
+    display: flex;
+    justify-content: center;
+}
+.filter_box {
+    display: flex;
+    justify-content: center;
+    padding: 17px 20px;
+    margin-bottom: 30px;
+    align-items: center;
+}
+.home_icon {
+    display: flex;
+    height: 35px;
+    padding: 7px;
+    font-size: 25px;
+    color: var(--text);
+    border-radius: 5px;
+}
+.separator {
+    display: flex;
+    margin-right: 2px;
+    margin-left: 2px;
+    font-size: xx-large;
+}
+/* TO DO: hover and clicked/active styles for filters */
+.filter {
+    display: flex;
+    font-size: 20px;
+    padding: 7px;
+    &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+.recipe_list {
+    display: flex;
+    padding: 20px;
+    flex-flow: wrap;
+    flex-direction: row;
+    align-items: stretch;
+}

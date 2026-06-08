@@ -3,7 +3,7 @@ RUN: npm run dev -- http://localhost:5173/
 
 
 TypeScript documentation: https://react.dev/learn/typescript
-
+Flexbox guide: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
 
 
 
