@@ -12,7 +12,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
             <h2>{recipe.name}</h2>
             {recipe.tags 
             ? recipe.tags.map((tag) => (
-                    <p key={tag} className="tag">{tag}</p>
+                    <p key={tag} className="tag">{tag.desc}</p>
                 ))
             : <p>No tags</p>
             }

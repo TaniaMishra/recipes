@@ -1,6 +1,7 @@
 .recipe_list {
     display: flex;
     padding: 20px;
+    justify-content: center;
     flex-flow: wrap;
     flex-direction: row;
     align-items: stretch;

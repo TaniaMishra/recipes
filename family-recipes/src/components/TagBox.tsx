@@ -7,13 +7,22 @@ type TagOption = {
     label: string;
 }
 
-export default function TagBox() {
-    const [selectedTags, setSelectedTags] = useState<string[]>([])
+interface TagBoxProps {
+    selectedTags: string[];
+    setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+export default function TagBox({ selectedTags, setSelectedTags }: TagBoxProps) {
     const [allTags, setAllTags] = useState<TagOption[]>();
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedTags([...event.target.value]);
+    const handleChange = (newValue: readonly TagOption[]) => {
+        setSelectedTags(newValue.map(tag => tag.value));
     };
+
+    const selectedOptions = selectedTags.map((tag) => ({
+        value: tag,
+        label: tag
+    }))
 
     useEffect(() => {
         async function fetchTags() {
@@ -23,10 +32,10 @@ export default function TagBox() {
             if (error) {
                 console.log("ERROR FETCHING TAGS", error)
             } else if (data) {
-                const uniqueTags = [...new Set(data)];
+                const uniqueTags = [...new Set(data.map((tag) => tag.desc))];
                 setAllTags(uniqueTags.map(tag => ({
-                    value: tag.desc,
-                    label: tag.desc,
+                    value: tag,
+                    label: tag
                 })))
             }
         }
@@ -37,8 +46,8 @@ export default function TagBox() {
         <CreatableSelect
             isMulti
             options={allTags}
-            // value={selectedTags}
-            // onChange={handleChange}
+            value={selectedOptions}
+            onChange={handleChange}
         />
     );
 }

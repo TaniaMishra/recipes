@@ -14,13 +14,17 @@ export default function Recipes() {
             setLoading(true);
             const { data, error } = await supabase
                 .from("recipes")
-                .select("*");
+                .select(`
+                    *,
+                    tags (desc)    
+                `);
             if (error) {
-                console.log("ERROR FETCHING RECIPES", error)
+                console.log("ERROR FETCHING RECIPES", error);
             } else if (data) {
-                setRecipes(data as Recipe[])
+                console.log(data);
+                setRecipes(data as Recipe[]);
             }
-            setLoading(false)
+            setLoading(false);
         }
         fetchRecipes();
     }, []);
