@@ -4,6 +4,7 @@ import '../styles/AddRecipe.css'
 // import { supabase } from "../lib/supabase";
 import TagBox from './TagBox';
 import { supabase } from '../lib/supabase';
+import { useNavigate } from "react-router-dom";
 
 type BM = {
     msm: number,
@@ -11,14 +12,21 @@ type BM = {
     ing: string,
     svg: number
 }
+enum InsertResult {
+  RecipeError = 0,
+  Success = 1,
+  TagError = 2,
+}
 
 export default function AddRecipe() {
+    const nav = useNavigate();
+
     const [name, setName] = useState<string>("");
     const [ver, setVer] = useState<string>("");
     const [bms, setBMs] = useState<BM[]>([
-        {msm: 0, unit: "", ing: "", svg: 0},
-        {msm: 0, unit: "", ing: "", svg: 0},
-        {msm: 0, unit: "", ing: "", svg: 0}
+        {msm: 0, unit: "cup", ing: "", svg: 0},
+        {msm: 0, unit: "cup", ing: "", svg: 0},
+        {msm: 0, unit: "cup", ing: "", svg: 0}
     ]);
     const [musts, setMusts] = useState<number[]>([]);
     const [body, setBody] = useState<string>("");
@@ -52,23 +60,16 @@ export default function AddRecipe() {
             setBMindex((prev) => (prev + 1))
         }
     }
-    // const handleBM1unit = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    //     setBM1((prevState) => ({
-    //         ...prevState,
-    //         unit: e.target.value
-    //     }));
-    // };
-    // const handleBM1svg = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    //     setBM1((prevState) => ({
-    //         ...prevState,
-    //         svg: Number(e.target.value)
-    //     }));
-    // };
     const handleBodyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setBody(e.target.value);
     }
 
-    const handleSubmit = async() => {
+    // TO DO: validate before insert
+    const validateRecipe = () => {
+        return true;
+    }
+
+    const insertRecipe = async(): Promise<InsertResult> => {
         console.log("submitted");
         // format BMs into individual strings
         const formattedBMs = bms.map((bm) => (
@@ -94,6 +95,7 @@ export default function AddRecipe() {
             .single();
         if (error) {
             console.log("ERROR INSERTING RECIPE", error)
+            return 0;
         } else if (data) {
             const rid = data.recipe_id;
             const tagRows = selectedTags.map((tag) => ({
@@ -105,9 +107,40 @@ export default function AddRecipe() {
                 .insert(tagRows);
             if (tagError) {
                 console.log("ERROR INSERTING TAGS", tagError);
-            } else {
-                console.log("SUCCESS!");
+                return 2;
             }
+            console.log("SUCCESS!");
+            return 1;
+        }
+        return 0;
+    }
+    const handleSubmitOne = async() => {
+        if (validateRecipe()) {
+            const result = await insertRecipe();
+            if (result == 1) {
+                nav('/recipes');
+            }
+        } else {
+            console.log("RECIPE INVALID, DID NOT INSERT");
+        }
+    }
+    const handleSubmitMore = async() => {
+        if (validateRecipe()) {
+            const result = await insertRecipe();
+            if (result == 1) {
+                setName('');
+                setVer('');
+                setBMs([
+                    {msm: 0, unit: "", ing: "", svg: 0},
+                    {msm: 0, unit: "", ing: "", svg: 0},
+                    {msm: 0, unit: "", ing: "", svg: 0}
+                ]);
+                setMusts([]);
+                setBody('');
+                setSelectedTags([]);
+            }
+        } else {
+            console.log("RECIPE INVALID, DID NOT INSERT");
         }
     }
 
@@ -134,14 +167,12 @@ export default function AddRecipe() {
                 {bmIndex <= bmMaxIndex ?
                     (Array.from({ length: (bmIndex+1) }).map((_, i) => 
                         (<div className='add_bm' key={i}>
-                            <select className='add_dropdown' defaultValue="def" onChange={(e) => handleBMchange(i, 'msm', e.target.value)}>
-                                <option value="def" disabled>Quantity</option>
+                            <select className='add_dropdown' value={bms[i].msm} onChange={(e) => handleBMchange(i, 'msm', e.target.value)}>
                                 {measurements.map((val, index) => (
                                     <option key={index} value={val}>{val}</option>
                                 ))}
                             </select>
-                            <select className='add_dropdown' defaultValue="def" onChange={(e) => handleBMchange(i, 'unit', e.target.value)}>
-                                <option value="def" disabled>Unit</option>
+                            <select className='add_dropdown' value={bms[i].unit} onChange={(e) => handleBMchange(i, 'unit', e.target.value)}>
                                 {units.map((val, index) => (
                                     <option key={index} value={val}>{val}</option>
                                 ))}
@@ -150,12 +181,11 @@ export default function AddRecipe() {
                                 key={i}
                                 placeholder='Ingredient'
                                 className='add_text_input'
-                                // value={}
+                                value={bms[i].ing}
                                 onChange={(e) => handleBMchange(i, 'ing', e.target.value)}
                             />
                             <p>=</p>
-                            <select className='add_dropdown' defaultValue="def" onChange={(e) => handleBMchange(i, 'svg', e.target.value)}>
-                                <option value="def" disabled>Quantity</option>
+                            <select className='add_dropdown' value={bms[i].svg} onChange={(e) => handleBMchange(i, 'svg', e.target.value)}>
                                 {Array.from({ length: 10 }).map((_, index) => (
                                     <option key={index} value={index}>{index}</option>
                                 ))}
@@ -178,7 +208,9 @@ export default function AddRecipe() {
                     selectedTags = {selectedTags}
                     setSelectedTags = {setSelectedTags}
                 />
-                <button onClick={handleSubmit}>Add Recipe</button>
+                <button onClick={handleSubmitOne}>Submit Recipe</button>
+                <button onClick={handleSubmitMore}>Submit Recipe & Add Another</button>
+
             </div>
         </div>
     </>
