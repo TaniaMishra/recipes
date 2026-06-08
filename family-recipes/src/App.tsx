@@ -1,5 +1,6 @@
 import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from './routes/ProtectedRoute';
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import Recipes from './components/Recipes';
@@ -19,10 +20,26 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/recipes" element={<Recipes />} />
-        <Route path="/meal-plan" element={<MealPlan />} />
-        <Route path="/kitchen" element={<Kitchen />} />
-        <Route path="/add-recipe" element={<AddRecipe />} />
-        <Route path="/my-profile" element={<Profile />} />
+        <Route path="/meal-plan" element={
+          <ProtectedRoute>
+            <MealPlan />
+          </ProtectedRoute>
+        } />
+        <Route path="/kitchen" element={
+          <ProtectedRoute>
+            <Kitchen />
+          </ProtectedRoute>
+        } />
+        <Route path="/add-recipe" element={
+          <ProtectedRoute>
+            <AddRecipe />
+          </ProtectedRoute>
+          }/>
+        <Route path="/my-profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
         <Route path="/login" element={<Login />} />
         <Route path="/create-account" element={<CreateUser />} />
         <Route path="/recipes/:recipeID" element={<ViewRecipe />} />

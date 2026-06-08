@@ -2,8 +2,10 @@
 import '../styles/CreateUser.css'
 import { supabase } from "../lib/supabase";
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateUser() {
+  const nav = useNavigate();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
@@ -16,6 +18,7 @@ export default function CreateUser() {
       console.log("ERROR CREATING ACCOUNT", error);
     } else if (data) {
       console.log("Account created successfully", data.user);
+      nav('/');
     }
   }
 

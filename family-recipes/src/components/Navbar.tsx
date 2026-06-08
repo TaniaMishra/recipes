@@ -1,7 +1,10 @@
 import { NavLink } from "react-router-dom";
 import '../styles/Navbar.css'
+import { useAuth } from "../hooks/useAuth";
 
 export default function Navbar() {
+    const { user } = useAuth();
+
     return (
         <nav>
             <div className="navbar">
@@ -14,20 +17,32 @@ export default function Navbar() {
                         className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                             Recipes
                     </NavLink>
-                    <NavLink to="/meal-plan"
-                        className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
-                            Meal Plan
-                    </NavLink>
-                    <NavLink to="/kitchen"
-                        className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
-                            My Kitchen
-                    </NavLink>
+                    {user ? 
+                        (<NavLink to="/meal-plan"
+                            className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
+                                Meal Plan
+                        </NavLink>)
+                        : <></>
+                    }
+                    {user ?
+                        (<NavLink to="/kitchen"
+                            className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
+                                My Kitchen
+                        </NavLink>)
+                        : <></>
+                    }
                 </div>
                 <div className="nav_profile">
-                    <NavLink to="/my-profile"
-                        className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
-                            Profile
-                    </NavLink>
+                    {user ? 
+                        (<NavLink to="/my-profile"
+                            className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
+                                Profile
+                        </NavLink>)
+                        : (<NavLink to="/login"
+                            className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
+                                Login
+                        </NavLink>)
+                    }
                 </div>
             </div>
         </nav>

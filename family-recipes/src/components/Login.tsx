@@ -2,8 +2,10 @@
 import '../styles/CreateUser.css'
 import { supabase } from "../lib/supabase";
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+  const nav = useNavigate();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
@@ -16,7 +18,11 @@ export default function Login() {
       console.log("ERROR LOGGING IN", error);
     } else if (data) {
       console.log("Log In Successful", data.user);
+      nav("/my-profile");
     }
+  }
+  const handleCreateReroute = () => {
+    nav("/create-account");
   }
 
   return (
@@ -26,17 +32,18 @@ export default function Login() {
         </div>
         <div className='login_box'>
             <h2>Enter your email:</h2>
-            <input type='text'
+            <input type='email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <h2>Enter your password:</h2>
-            <input type='text'
+            <input type='password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button onClick={handleLogin}>Create Account</button>
+            <button onClick={handleLogin}>Login</button>
         </div>
+        <button onClick={handleCreateReroute}>Don't have an account? Create one here</button>
     </>
   )
 }
