@@ -19,6 +19,9 @@ export default function Profile() {
             <p>Email: {user?.email}</p>
             <button onClick={handleLogout}>Logout</button>
         </div>
+        <div>
+          {/* TODO: add must have items: text box (like the tag text box in add recipes) */}
+        </div>
     </>
   )
 }

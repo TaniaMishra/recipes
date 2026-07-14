@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import '../styles/AddRecipe.css'
-// import { useEffect } from "react";
-// import { supabase } from "../lib/supabase";
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +14,7 @@ export default function AddItemModal({ onClose }: ModalProps) {
     const { user } = useAuth();
     const nav = useNavigate();
 
-    const cat_options = ["Pantry", "Fridge", "Produce", "Non-Produce Fridge", "Condiments", "Spices"];
+    const cat_options = ["Produce", "Non-Produce Fridge", "Pantry", "Frozen", "Condiments", "Spices"];
     const stat_options = ["have", "low", "out"];
 
     const [item, setItem] = useState<string>("");

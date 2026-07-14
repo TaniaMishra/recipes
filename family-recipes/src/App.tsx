@@ -11,11 +11,13 @@ import Profile from './components/Profile';
 import Login from './components/Login';
 import CreateUser from './components/CreateUser';
 import ViewRecipe from './components/ViewRecipe';
+import { KitchenProvider } from './context/KitchenContext';
 
 function App() {
 
   return (
     <BrowserRouter>
+      <KitchenProvider>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -45,6 +47,7 @@ function App() {
         <Route path="/recipes/:recipeID" element={<ViewRecipe />} />
 
       </Routes>
+      </KitchenProvider>
     </BrowserRouter>
   )
 }

@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import '../styles/Navbar.css'
 import { useAuth } from "../hooks/useAuth";
+import ProtectedNavLink from "./ProtectedNavLink";
 
 export default function Navbar() {
     const { user } = useAuth();
@@ -9,19 +10,19 @@ export default function Navbar() {
         <nav>
             <div className="navbar">
                 <div className="nav_pages">
-                    <NavLink to="/"
+                    <ProtectedNavLink to="/"
                         className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                             What's for dinner?
-                    </NavLink>
-                    <NavLink to="/recipes"
+                    </ProtectedNavLink>
+                    <ProtectedNavLink to="/recipes"
                         className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                             Recipes
-                    </NavLink>
+                    </ProtectedNavLink>
                     {user ? 
-                        (<NavLink to="/meal-plan"
+                        (<ProtectedNavLink to="/meal-plan"
                             className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                                 Meal Plan
-                        </NavLink>)
+                        </ProtectedNavLink>)
                         : <></>
                     }
                     {user ?
@@ -34,10 +35,10 @@ export default function Navbar() {
                 </div>
                 <div className="nav_profile">
                     {user ? 
-                        (<NavLink to="/my-profile"
+                        (<ProtectedNavLink to="/my-profile"
                             className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                                 Profile
-                        </NavLink>)
+                        </ProtectedNavLink>)
                         : (<NavLink to="/login"
                             className={({ isActive }) => isActive ? 'nav_active' : 'nav_inactive'}>
                                 Login
