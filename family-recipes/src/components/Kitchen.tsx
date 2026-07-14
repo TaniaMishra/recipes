@@ -3,9 +3,11 @@ import '../styles/Kitchen.css'
 import { useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import AddItemModal from './AddItemModal';
+import { useAuth } from '../context/useAuth';
 
 
 export default function Kitchen() {
+    const { user } = useAuth();
     const initialState = () => ({ have: [], low: [], out: [] });
 
     const [pantry, setPantry] = useState<Record<string, Item[]>>(initialState);
@@ -24,28 +26,82 @@ export default function Kitchen() {
       return organizedObj;
     }
 
+    type ItemStatus = "have_items" | "low_items" | "out_items";
+
+    async function getKitchenItems(status: ItemStatus) {
+        // ensure user is logged in, return 1 if error
+        if (!user) return 1;
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("have_items, low_items, out_items")
+          .eq("id", user.id)
+          .single();
+        if (profileError || !profile) return 2;
+        const ids = profile[status] ?? [];
+        const { data, error } = await supabase
+            .from("kitchen")
+            .select("*")
+            .in("item_id", ids);
+        if (error) return 1;
+        return data;
+    }
+
     useEffect(() => {
         async function fetchAllKitchenItems() {
           setLoading(true);
-            const { data, error } = await supabase
-                .from("kitchen")
-                .select("*");
-            if (error) {
-                console.log("ERROR FETCHING RECIPES", error)
-            } else if (data) {
-                setPantry(filterStatusByProfile(data.filter(item => item.category === 'Pantry')));
-                setFrozen({have: [], low: [], out: data.filter(item => item.category === 'Frozen')});
-                setProduce({have: [], low: [], out: data.filter(item => item.category === 'Produce')});
-                setNPFridge({have: [], low: [], out: data.filter(item => item.category === 'Non-Produce Fridge')});
-                setCondiments({have: [], low: [], out: data.filter(item => item.category === 'Condiments')});
-                setSpices({have: [], low: [], out: data.filter(item => item.category === 'Spices')});
+            const haveItems = await getKitchenItems("have_items");
+            const lowItems = await getKitchenItems("low_items");
+            const outItems = await getKitchenItems("out_items");
+            if (haveItems == 2 || haveItems == 1 || lowItems == 2 || lowItems == 1 || outItems == 2 || outItems == 1) {
+                console.log("ERROR FETCHING ITEMS")
+            } else {
+                console.log("have items:", haveItems);
+                setPantry({
+                    have: haveItems.filter(item => item.category === 'Pantry'),
+                    low: lowItems.filter(item => item.category === 'Pantry'),
+                    out: outItems.filter(item => item.category === 'Pantry')
+                });
+                setFrozen({
+                    have: haveItems.filter(item => item.category === 'Frozen'),
+                    low: lowItems.filter(item => item.category === 'Frozen'),
+                    out: outItems.filter(item => item.category === 'Frozen')
+                });
+                setProduce({
+                    have: haveItems.filter(item => item.category === 'Produce'),
+                    low: lowItems.filter(item => item.category === 'Produce'),
+                    out: outItems.filter(item => item.category === 'Produce')
+                });
+                setNPFridge({
+                    have: haveItems.filter(item => item.category === 'Non-Produce Fridge'),
+                    low: lowItems.filter(item => item.category === 'Non-Produce Fridge'),
+                    out: outItems.filter(item => item.category === 'Non-Produce Fridge')
+                });
+                setCondiments({
+                    have: haveItems.filter(item => item.category === 'Condiments'),
+                    low: lowItems.filter(item => item.category === 'Condiments'),
+                    out: outItems.filter(item => item.category === 'Condiments')
+                });
+                setSpices({
+                    have: haveItems.filter(item => item.category === 'Spices'),
+                    low: lowItems.filter(item => item.category === 'Spices'),
+                    out: outItems.filter(item => item.category === 'Spices')
+                });
                 setLoading(false);
             }
         }
         fetchAllKitchenItems();
     }, []);
+    
+    const items_by_cat = [pantry, frozen, produce, npfridge, condiments, spices];
+    const maxRows = Math.max(
+        ...items_by_cat.flatMap(ctg => [
+            ctg.have?.length ?? 0,
+            ctg.low?.length ?? 0,
+            ctg.out?.length ?? 0,
+        ])
+    );
 
-    const maxRows = Math.max(pantry.out.length, frozen.out.length, produce.out.length, npfridge.out.length, condiments.out.length, spices.out.length);
+    const cat_titles = ["Pantry", "Fridge", "Produce", "Non-Produce Fridge", "Condiments", "Spices"];
 
     const closeModal = () => {
       setAddModal(false);
@@ -59,33 +115,34 @@ export default function Kitchen() {
         </div>
         {maxRows === 0 ?
           (<p>No items in kitchen.</p>)
-          : (<div className='cat_div'>
-              <h2 className='cat_heading'>Pantry</h2>
-              <table className='cat_table'>
-                <thead>
-                  <tr>
-                    <th>Have</th>
-                    <th>Low</th>
-                    <th>Out</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ?
-                    (<tr>
-                      <td colSpan={3}>Loading kitchen...</td>
-                    </tr>)
-                    : Array.from({ length: maxRows }).map((_, index) => (
-                      <tr key={index}>
-                        <td>{pantry.have[index] ? pantry.have[index].item : ""}</td>
-                        <td>{pantry.low[index] ? pantry.low[index].item : ""}</td>
-                        <td>{pantry.out[index] ? pantry.out[index].item : ""}</td>
-                      </tr>
-                    ))
-                  }
-                </tbody>
-              </table>
-            </div>
-          )
+          : cat_titles.map((ctg, i) => (
+              <div className='cat_div'key={ctg}>
+                <h2 className='cat_heading'>{ctg}</h2>
+                <table className='cat_table'>
+                  <thead>
+                    <tr>
+                      <th>Have</th>
+                      <th>Low</th>
+                      <th>Out</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ?
+                      (<tr>
+                        <td colSpan={3}>Loading {ctg}...</td>
+                      </tr>)
+                      : Array.from({ length: maxRows }).map((_, index) => (
+                        <tr key={index}>
+                          <td>{pantry.have[index] ? pantry.have[index].item : ""}</td>
+                          <td>{pantry.low[index] ? pantry.low[index].item : ""}</td>
+                          <td>{pantry.out[index] ? pantry.out[index].item : ""}</td>
+                        </tr>
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </div>
+          ))
         }
     </>
   )
