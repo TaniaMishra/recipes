@@ -17,6 +17,7 @@ export default function Kitchen() {
     type Category = { have: Item[], low: Item[], out: Item[] };
     const initialState = (): Category => ({ have: [], low: [], out: [] });
 
+    // TODO: move itemsbycat and related functions into kitchen context
     const [itemsByCat, setItemsByCat] = useState<Category[]>([
       initialState(), // Produce
       initialState(), // Non-Produce Fridge
