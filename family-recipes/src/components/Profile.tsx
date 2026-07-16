@@ -20,6 +20,8 @@ export default function Profile() {
             <button onClick={handleLogout}>Logout</button>
         </div>
         <div>
+          <h2>Essentials in my kitchen</h2>
+          <p>Automatically add to my grocery list when out or running low</p>
           {/* TODO: add must have items: text box (like the tag text box in add recipes) */}
         </div>
     </>

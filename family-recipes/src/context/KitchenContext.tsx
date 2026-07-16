@@ -1,13 +1,9 @@
-import {
-  createContext,
-  useContext,
-  useState
-} from "react";
+import { createContext, useContext, useState } from "react";
 
 type KitchenContextType = {
   dirty: boolean;
   setDirty: (value: boolean) => void;
-};
+}
 
 const KitchenContext = createContext<KitchenContextType | null>(null);
 

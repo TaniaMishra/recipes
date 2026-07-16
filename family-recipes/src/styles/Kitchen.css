@@ -1,3 +1,14 @@
+.kitchen {
+    display: flex;
+    width: 95%;
+}
+.kitchen_items {
+    width:80%;
+}
+.groclist_modal {
+    width:20%
+}
+
 .cat_div {
     display: flex;
     flex-direction: column;

@@ -6,12 +6,13 @@ import AddItemModal from './AddItemModal';
 import { useAuth } from '../context/useAuth';
 import GrocListModal from './GrocListModal';
 import { useKitchen } from '../context/KitchenContext';
+import { useGroceryList } from '../context/GroceryListContext';
 
 
 export default function Kitchen() {
     const { user } = useAuth();
-        // const [dirty, setDirty] = useState(false);
     const { dirty, setDirty } = useKitchen();
+    const { refreshGrocList, addItemGrocList } = useGroceryList();
 
     type Category = { have: Item[], low: Item[], out: Item[] };
     const initialState = (): Category => ({ have: [], low: [], out: [] });
@@ -26,7 +27,7 @@ export default function Kitchen() {
     ]);
 
     const [draggedItem, setDraggedItem] = useState<{
-      itemId: number;
+      item: Item;
       ctg_index: number;
       status: "have" | "low" | "out";
     } | null>(null);
@@ -104,6 +105,7 @@ export default function Kitchen() {
             }
         }
         fetchAllKitchenItems();
+        refreshGrocList();
     }, []);
 
     const handleDrop = (newCtgIndex: number, newStatus: "have" | "low" | "out") => {
@@ -121,11 +123,11 @@ export default function Kitchen() {
         const updated = [...prev]
         const cat_items = {...updated[newCtgIndex]};
         // save item
-        const item_to_move = cat_items[draggedItem.status].find((itm) => itm.item_id === draggedItem.itemId);
+        // const item_to_move = cat_items[draggedItem.status].find((itm) => itm.item_id === draggedItem.item.item_id);
         // remove item from old status list
-        cat_items[draggedItem.status] = cat_items[draggedItem.status].filter((itm) => itm.item_id !== draggedItem.itemId);
+        cat_items[draggedItem.status] = cat_items[draggedItem.status].filter((itm) => itm.item_id !== draggedItem.item.item_id);
         // add item to new status list
-        cat_items[newStatus] = [...cat_items[newStatus], item_to_move];
+        cat_items[newStatus] = [...cat_items[newStatus], draggedItem.item];
         // update state
         updated[newCtgIndex] = cat_items;
         return updated;
@@ -174,12 +176,16 @@ export default function Kitchen() {
       }
     }, [dirty]);
 
-    // close functions to pass to modal components
+    // functions to pass to modal components
     const closeAddModal = () => {
       setAddModal(false);
     }
     const closeGrocListModal = () => {
       setGrocListModal(false);
+    }
+    const handleGrocListDrop = () => {
+      if (!draggedItem) return;
+      addItemGrocList(draggedItem.item);
     }
 
     const maxRows = Math.max(
@@ -192,106 +198,113 @@ export default function Kitchen() {
     const cat_titles = ["Produce", "Non-Produce Fridge", "Pantry", "Frozen", "Condiments", "Spices"];
 
     return (
-    <>
-        <div>
-            <h1>Kitchen</h1>
-            {addModal ? <AddItemModal onClose={closeAddModal}/> : <button onClick={() => setAddModal(true)}>Add Item</button>}
-        </div>
-        <div>
-          {dirty ? <button onClick={handleSaveKitchen}>Save changes</button> : <></>}
-        </div>
-        {maxRows === 0 ?
-          (<p>No items in kitchen.</p>)
-          : cat_titles.map((ctg, i) => (
-              <div className='cat_div'key={ctg}>
-                <h2 className='cat_heading'>{ctg}</h2>
-                <table className='cat_table'>
-                  <thead>
-                    <tr>
-                      <th className='tbl_heading'>Have</th>
-                      <th className='tbl_heading'>Low</th>
-                      <th className='tbl_heading'>Out</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {loading ?
-                      (<tr>
-                        <td colSpan={3}>Loading {ctg}...</td>
-                      </tr>)
-                      : <tr>
-                          <td className='tbl_box'
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={() => handleDrop(i, "have")}
-                          >
-                            <ul className='tbl_ul'>
-                              {itemsByCat[i].have.map((itm) => (
-                                <li key={itm.item_id}
-                                  className='item_li'
-                                  draggable="true"
-                                  onDragStart={() =>
-                                    setDraggedItem({
-                                      itemId: itm.item_id,
-                                      ctg_index: i,
-                                      status: "have"
-                                    })
-                                  }
-                                  >{itm.item}</li>
-                              ))}
-                            </ul>
-                          </td>
-                          <td className='tbl_box'
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={() => handleDrop(i, "low")}
-                          >
-                            <ul className='tbl_ul'>
-                              {itemsByCat[i].low.map((itm) => (
-                                <li key={itm.item_id}
-                                  className='item_li'
-                                  draggable="true"
-                                  onDragStart={() =>
-                                    setDraggedItem({
-                                      itemId: itm.item_id,
-                                      ctg_index: i,
-                                      status: "low"
-                                    })
-                                  }
-                                  >{itm.item}</li>
-                              ))}
-                            </ul>
-                          </td>
-                          <td className='tbl_box'
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={() => handleDrop(i, "out")}
-                          >
-                            <ul className='tbl_ul'>
-                              {itemsByCat[i].out.map((itm) => (
-                                <li key={itm.item_id}
-                                  className='item_li'
-                                  draggable="true"
-                                  onDragStart={() =>
-                                    setDraggedItem({
-                                      itemId: itm.item_id,
-                                      ctg_index: i,
-                                      status: "out"
-                                    })
-                                  }
-                                  >{itm.item}</li>
-                              ))}
-                            </ul>
-                          </td>
+      <div className='kitchen'>
+        <div className='kitchen_items'>
+            <div>
+                <h1>Kitchen</h1>
+                {addModal ? <AddItemModal onClose={closeAddModal}/> : <button onClick={() => setAddModal(true)}>Add Item</button>}
+            </div>
+            <div>
+              {dirty ? <button onClick={handleSaveKitchen}>Save changes</button> : <></>}
+            </div>
+            {maxRows === 0 ?
+              (<p>No items in kitchen.</p>)
+              : cat_titles.map((ctg, i) => (
+                  <div className='cat_div'key={ctg}>
+                    <h2 className='cat_heading'>{ctg}</h2>
+                    <table className='cat_table'>
+                      <thead>
+                        <tr>
+                          <th className='tbl_heading'>Have</th>
+                          <th className='tbl_heading'>Low</th>
+                          <th className='tbl_heading'>Out</th>
                         </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-          ))
-        }
-        {grocListModal ?
-          <GrocListModal onClose={closeGrocListModal} />
-          : <></>
-        }
-    </>
-  )
+                      </thead>
+                      <tbody>
+                        {loading ?
+                          (<tr>
+                            <td colSpan={3}>Loading {ctg}...</td>
+                          </tr>)
+                          : <tr>
+                              <td className='tbl_box'
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={() => handleDrop(i, "have")}
+                              >
+                                <ul className='tbl_ul'>
+                                  {itemsByCat[i].have.map((itm) => (
+                                    <li key={itm.item_id}
+                                      className='item_li'
+                                      draggable="true"
+                                      onDragStart={() =>
+                                        setDraggedItem({
+                                          item: itm,
+                                          ctg_index: i,
+                                          status: "have"
+                                        })
+                                      }
+                                      >{itm.item}</li>
+                                  ))}
+                                </ul>
+                              </td>
+                              <td className='tbl_box'
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={() => handleDrop(i, "low")}
+                              >
+                                <ul className='tbl_ul'>
+                                  {itemsByCat[i].low.map((itm) => (
+                                    <li key={itm.item_id}
+                                      className='item_li'
+                                      draggable="true"
+                                      onDragStart={() =>
+                                        setDraggedItem({
+                                          item: itm,
+                                          ctg_index: i,
+                                          status: "low"
+                                        })
+                                      }
+                                      >{itm.item}</li>
+                                  ))}
+                                </ul>
+                              </td>
+                              <td className='tbl_box'
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={() => handleDrop(i, "out")}
+                              >
+                                <ul className='tbl_ul'>
+                                  {itemsByCat[i].out.map((itm) => (
+                                    <li key={itm.item_id}
+                                      className='item_li'
+                                      draggable="true"
+                                      onDragStart={() =>
+                                        setDraggedItem({
+                                          item: itm,
+                                          ctg_index: i,
+                                          status: "out"
+                                        })
+                                      }
+                                      >{itm.item}</li>
+                                  ))}
+                                </ul>
+                              </td>
+                            </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+              ))
+            }
+        </div>
+        <div className='groclist_modal'>
+          {grocListModal ?
+              <GrocListModal
+                onClose={closeGrocListModal}
+                onDrop={handleGrocListDrop}
+              />
+              : <></>
+            }
+        </div>
+      </div>
+    )
 }
 
 // OLD VERSION OF TABLE (each item is a new tr)
