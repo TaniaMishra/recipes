@@ -74,10 +74,14 @@ export default function Kitchen() {
 
     return (
       <div className='kitchen'>
-        <div className='kitchen_items'>
+        <div className={grocListModal ? 'kitchen_items' : 'kitchen_items_full'}>
             <div>
                 <h1>Kitchen</h1>
                 {addModal ? <AddItemModal onClose={closeAddModal}/> : <button onClick={() => setAddModal(true)}>Add Item</button>}
+                {!grocListModal
+                  ? <button onClick={() => setGrocListModal(true)} className='groclist_btn'>Open grocery list</button>
+                  : <></>
+                }
             </div>
             <div>
               {dirty ? <button onClick={updateKitchen}>Save changes</button> : <></>}
@@ -164,7 +168,7 @@ export default function Kitchen() {
               ))
             }
         </div>
-        <div className='groclist_modal'>
+        <div className={grocListModal ? 'groclist_modal' : 'groclist_modal_closed'}>
           {grocListModal ?
               <GrocListModal
                 onClose={closeGrocListModal}
