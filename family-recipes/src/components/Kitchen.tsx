@@ -6,7 +6,8 @@ import GrocListModal from './GrocListModal';
 import { useKitchen } from '../context/KitchenContext';
 import { useGroceryList } from '../context/GroceryListContext';
 
-
+// TODO: delete items from grocery list (hover, click to strikethrough, set dirty, save changes to delete)
+// TODO: delete items from my kitchen (drag and drop into trash) - don't delete from kitchen table, just profile table
 export default function Kitchen() {
     const { dirty, setDirty, kitchenItemsByCat, setKitchenItemsByCat, fetchAllKitchenItems,updateKitchen, maxRows, ctgTitles, fetchAllitems } = useKitchen();
     const { refreshGrocList, addItemGrocList } = useGroceryList();
