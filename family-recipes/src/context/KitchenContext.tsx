@@ -10,7 +10,7 @@ type KitchenContextType = {
   kitchenItemsByCat: Category[];
   setKitchenItemsByCat: (value: Category[]) => void;
   fetchAllKitchenItems: () => void;
-  updateKitchen: () => void;
+  updateKitchenDB: () => void;
   maxRows: number;
   ctgTitles: string[];
   allItems: Item[];
@@ -119,7 +119,7 @@ export function KitchenProvider({ children } : { children: React.ReactNode }) {
     }
   
     // update database if dirty
-    const updateKitchen = async () => {
+    const updateKitchenDB = async () => {
       if (!user) return;
       if (!dirty) return;
       // get list of item ids for each status
@@ -153,7 +153,7 @@ export function KitchenProvider({ children } : { children: React.ReactNode }) {
         kitchenItemsByCat,
         setKitchenItemsByCat,
         fetchAllKitchenItems,
-        updateKitchen,
+        updateKitchenDB,
         maxRows,
         ctgTitles,
         allItems,

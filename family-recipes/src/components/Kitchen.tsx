@@ -9,8 +9,8 @@ import { useGroceryList } from '../context/GroceryListContext';
 // TODO: delete items from grocery list (hover, click to strikethrough, set dirty, save changes to delete)
 // TODO: delete items from my kitchen (drag and drop into trash) - don't delete from kitchen table, just profile table
 export default function Kitchen() {
-    const { dirty, setDirty, kitchenItemsByCat, setKitchenItemsByCat, fetchAllKitchenItems,updateKitchen, maxRows, ctgTitles, fetchAllitems } = useKitchen();
-    const { getGrocList, addItemGrocList, updateGrocListDB } = useGroceryList();
+    const { dirty, setDirty, kitchenItemsByCat, setKitchenItemsByCat, fetchAllKitchenItems, updateKitchenDB, maxRows, ctgTitles, fetchAllitems } = useKitchen();
+    const { getGrocList, addItemGrocList } = useGroceryList();
 
     const [addModal, setAddModal] = useState<boolean>(false);
     const [grocListModal, setGrocListModal] = useState<boolean>(true);
@@ -110,7 +110,7 @@ export default function Kitchen() {
               }
             </div>
             <div>
-              {dirty ? <button onClick={updateKitchen}>Save changes</button> : <></>}
+              {dirty ? <button onClick={updateKitchenDB}>Save changes</button> : <></>}
             </div>
             {maxRows === 0 ?
               (<p>No items in kitchen.</p>)
