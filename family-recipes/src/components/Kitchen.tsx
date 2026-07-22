@@ -10,7 +10,7 @@ import { useGroceryList } from '../context/GroceryListContext';
 // TODO: delete items from my kitchen (drag and drop into trash) - don't delete from kitchen table, just profile table
 export default function Kitchen() {
     const { dirty, setDirty, kitchenItemsByCat, setKitchenItemsByCat, fetchAllKitchenItems,updateKitchen, maxRows, ctgTitles, fetchAllitems } = useKitchen();
-    const { refreshGrocList, addItemGrocList } = useGroceryList();
+    const { getGrocList, addItemGrocList, updateGrocListDB } = useGroceryList();
 
     const [addModal, setAddModal] = useState<boolean>(false);
     const [grocListModal, setGrocListModal] = useState<boolean>(true);
@@ -24,14 +24,16 @@ export default function Kitchen() {
     useEffect(() => {
         fetchAllitems();
         fetchAllKitchenItems();
-        refreshGrocList();
+        getGrocList();
     }, []);
 
     const handleDrop = (newCtgIndex: number, newStatus: "have" | "low" | "out") => {
       // draggedItem state is null (nothing being dragged), moved to the same spot, moved to a different category - return from function
       if (!draggedItem) return;
-      if (draggedItem.ctg_index === newCtgIndex && draggedItem.status === newStatus) return;
-      if (draggedItem.ctg_index !== newCtgIndex) return;
+      if ((draggedItem.ctg_index === newCtgIndex && draggedItem.status === newStatus) || (draggedItem.ctg_index !== newCtgIndex)) {
+        setDraggedItem(null);
+        return;
+      }
 
       // draggedItem is moved to a new status in the same category - update state
       setDirty(true);
@@ -43,6 +45,20 @@ export default function Kitchen() {
       cat_items[newStatus] = [...cat_items[newStatus], draggedItem.item];
       updatedItemsByCat[newCtgIndex] = cat_items;
       // update state
+      setKitchenItemsByCat(updatedItemsByCat);
+      setDraggedItem(null);
+    }
+
+    const handleDeleteDrop = () => {
+      // draggedItem state is null (nothing being dragged) - return from function
+      if (!draggedItem) return;
+
+      setDirty(true);
+      const updatedItemsByCat = [...kitchenItemsByCat];
+      // remove item from list
+      const itmDeleted = updatedItemsByCat[draggedItem.ctg_index][draggedItem.status].filter((itm) => itm.item_id !== draggedItem.item.item_id);
+      // update state
+      updatedItemsByCat[draggedItem.ctg_index][draggedItem.status] = itmDeleted;
       setKitchenItemsByCat(updatedItemsByCat);
       setDraggedItem(null);
     }
@@ -71,18 +87,27 @@ export default function Kitchen() {
     const handleGrocListDrop = () => {
       if (!draggedItem) return;
       addItemGrocList(draggedItem.item);
+      setDraggedItem(null);
     }
 
     return (
       <div className='kitchen'>
         <div className={grocListModal ? 'kitchen_items' : 'kitchen_items_full'}>
-            <div>
+            <div className='kitchen_header'>
+              <div className={draggedItem ? 'kitchen_title_small' : 'kitchen_title_full'}>
                 <h1>Kitchen</h1>
                 {addModal ? <AddItemModal onClose={closeAddModal}/> : <button onClick={() => setAddModal(true)}>Add Item</button>}
                 {!grocListModal
                   ? <button onClick={() => setGrocListModal(true)} className='groclist_btn'>Open grocery list</button>
                   : <></>
                 }
+              </div>
+              {draggedItem
+                ? <div className='delete_box_open' onDragOver={(e) => e.preventDefault()} onDrop={handleDeleteDrop}>
+                    <p>Delete</p>
+                  </div>
+                : <div className='delete_box_closed'></div>
+              }
             </div>
             <div>
               {dirty ? <button onClick={updateKitchen}>Save changes</button> : <></>}

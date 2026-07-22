@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useState } from "react";
 import { useAuth } from "./useAuth";
 import { supabase } from "../lib/supabase";
-import { useKitchen } from "./KitchenContext";
 
 type GroceryListContextType = {
     grocListItems: Item[];
-    refreshGrocList: () => Promise<void>;
-    updateGrocList: () => Promise<void>;
-    addItemGrocList: (arg0: Item) => void;
-    rmItemGrocList: (arg0: Item) => void;
+    getGrocList: () => Promise<void>;
+    compileGrocList: () => Promise<void>;
+    updateGrocListDB: () => Promise<void>;
+    addItemGrocList: (value: Item) => void;
+    rmItemGrocList: (value: Item) => void;
     grocListDirty: boolean;
     removeHaves: () => void;
 }
@@ -34,8 +34,8 @@ export function GroceryListProvider({ children } : { children: React.ReactNode; 
         return profile[get_col];
     }
 
-    async function updateGrocList() {
-        if (!user) return 1;
+    async function updateGrocListDB() {
+        if (!user) throw Error("No user logged in");
         const grocListIds = grocListItems.map((itm) => itm.item_id);
         const { error: profileInsertError } = await supabase
             .from("profiles")
@@ -43,15 +43,29 @@ export function GroceryListProvider({ children } : { children: React.ReactNode; 
                 grocery_list: grocListIds
             })
             .eq("id", user.id);
-        if (profileInsertError) return 2;
+        if (profileInsertError) throw Error("Error occured while updating grocery list in profiles table");
         setGrocListDirty(false);
     }
 
-    async function refreshGrocList() {
-        if (!user) return 1;
-        // get list of must have item ids, current grocery list, low/out item ids for logged in user, return if fetch failed
-        const curr_list = await getItems("grocery_list");
-        if (!curr_list) return;
+    async function getGrocList() {
+        const groc_list = await getItems("grocery_list");
+        if (!groc_list) return;
+        // if new list is same as current list - return
+        if ((groc_list.length === grocListItems.length) && (grocListItems.every((itm) => groc_list.includes(itm.item_id)))) return;
+        // get kitchen items that match the groc list of ids, throw error if select fails
+        const { data, error } = await supabase
+            .from("kitchen")
+            .select("*")
+            .in("item_id", groc_list);
+        if (error) throw Error("Error occured while fetching grocery list from kitchen table");
+        // update state
+        setGrocListDirty(true);
+        setGrocListItems(data);
+    }
+
+    async function compileGrocList() {
+        if (!user) throw Error("No user logged in");
+        // get list of must have item ids, low/out item ids for logged in user, throw error fetch failed
         const must_items = await getItems("must_items");
         if (!must_items) return;
         const low_items = await getItems("low_items");
@@ -62,39 +76,36 @@ export function GroceryListProvider({ children } : { children: React.ReactNode; 
         const listMusts = must_items.filter((mst_itm) => {
            if (low_items.includes(mst_itm) || out_items.includes(mst_itm)) return mst_itm;
         });
-        // combine list with haves removed and list of must items that are low/out, remove duplicates
-        const newListasSet = new Set([...curr_list, ...listMusts]);
+        // combine list of must items that are low/out with current list, remove duplicates
+        const currList = grocListItems.map((itm) => itm.item_id);
+        const newListasSet = new Set([...currList, ...listMusts]);
         const newList = [...newListasSet];
-        // get kitchen items that match the status list of ids, return 2 if select fails
+        // get kitchen items that match the status list of ids, throw error if select fails
         const { data, error } = await supabase
             .from("kitchen")
             .select("*")
             .in("item_id", newList);
-        if (error) return 2;
+        if (error) throw Error("Error occured while fetching grocery list from kitchen table");
         // set dirty if currlist != newlist
-        if (!curr_list.every((itm) => newListasSet.has(itm))) setGrocListDirty(true);
+        if ((currList.length !== newList.length) || (!currList.every((itmID) => newListasSet.has(itmID)))) setGrocListDirty(true);
         // return kitchen items on grocery list
         setGrocListItems(data);
-        return data;
     };
 
     async function removeHaves() {
-        // get list of current grocery list and item ids for logged in user, return if fetch failed
-        // const curr_list = await getItems("grocery_list");
-        // if (!curr_list) return;
+        // get item ids in stock for logged in user, return if fetch failed
         const have_items = await getItems("have_items")
         if (!have_items) return;
-        // if currlist includes items in have - remove from list
-        // const newList = curr_list.filter((itm) => !have_items.includes(itm));
+        // remove have items from groc list
         setGrocListItems((prev) => prev.filter((itm) => !have_items.includes(itm.item_id)))
         setGrocListDirty(true);
     }
 
     function addItemGrocList(newItem: Item) {
-        // remove if already in list
-        const newList = grocListItems.filter((itm) => itm.item_id !== newItem.item_id);
+        // if already in list - return
+        if (grocListItems.some((itm) => itm.item_id === newItem.item_id)) return;
         // add to list
-        setGrocListItems([...newList, newItem]);
+        setGrocListItems([...grocListItems, newItem]);
         setGrocListDirty(true);
     }
     function rmItemGrocList(rmItem: Item) {
@@ -106,8 +117,9 @@ export function GroceryListProvider({ children } : { children: React.ReactNode; 
         <GroceryListContext.Provider
             value = {{
                 grocListItems,
-                refreshGrocList,
-                updateGrocList,
+                getGrocList,
+                compileGrocList,
+                updateGrocListDB,
                 addItemGrocList,
                 rmItemGrocList,
                 grocListDirty,
