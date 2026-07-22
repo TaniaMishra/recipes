@@ -1,0 +1,72 @@
+.kitchen {
+    display: flex;
+    width: 95%;
+    align-self: center;
+}
+.kitchen_header {
+    display: flex;
+    flex-direction: row;
+}
+.kitchen_title_small {
+    width: 80%;
+}
+.kitchen_title_full {
+    width: 100%;
+}
+.delete_box_open {
+    width: 20%;
+    border: 1px dashed var(--accent-border);
+}
+.delete_box_closed {
+    display: none;
+}
+.kitchen_items {
+    width:80%;
+    transition: width 0.3s ease;
+}
+.kitchen_items_full {
+    width:100%;
+    transition: width 0.3s ease;
+
+}
+.groclist_modal {
+    width:20%;
+}
+.groclist_modal_closed {
+    display: none;
+
+}
+.groclist_btn {
+    align-self: right;
+}
+
+.cat_div {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    
+}
+.cat_heading {
+    text-align: left;
+}
+
+.cat_table {
+    width: 95%;
+    align-self: center;
+}
+
+.tbl_heading {
+    width: 33%;
+}
+
+.tbl_box {
+    border: 1px solid var(--accent-border);
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.tbl_ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}

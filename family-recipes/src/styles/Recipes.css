@@ -1,0 +1,27 @@
+.recipe_list {
+    display: flex;
+    padding: 20px;
+    justify-content: center;
+    flex-flow: wrap;
+    flex-direction: row;
+    align-items: stretch;
+}
+.add_button {
+    width: 50%;
+    color: var(--text);
+    padding: 5px;
+    border-radius: 5px;
+    border: 2px solid var(--accent-border);
+    transition: border-color 0.3s;
+    background-color: var(--accent-bg);
+    align-self: center;
+    &:hover {
+        color: var(--text-h);
+        background-color: var(--accent);
+    }
+}
+.add_link {
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+}

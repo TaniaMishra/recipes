@@ -1,3 +1,12 @@
+BUILD: npm run build
+RUN: npm run dev -- http://localhost:5173/
+
+
+TypeScript documentation: https://react.dev/learn/typescript
+Flexbox guide: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

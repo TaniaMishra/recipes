@@ -1,0 +1,13 @@
+.recipe {
+    display: flex;
+    flex-flow: column;
+    margin: 5%;
+    margin-top: 15px;
+    width: 90%;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 5px;
+    border: 2px solid var(--accent-border);
+    transition: border-color 0.3s;
+    background-color: var(--accent-bg);
+}
