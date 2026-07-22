@@ -38,7 +38,7 @@ export default function ViewRecipe() {
                         <div className='recipe_heading'>
                             <h1>{recipe.name}</h1>
                             <p>{recipe.tags}</p>
-                            <p>{recipe.bm1}, {recipe.bm2}, {recipe.bm3}</p>
+                            {/* <p>{recipe.bm1}, {recipe.bm2}, {recipe.bm3}</p> */}
                         </div>
                         <div className='whitespace-pre-line'>
                             <p>{recipe.body}</p>

@@ -1,3 +1,5 @@
+import { uuid } from "./uuid";
+
 export {};
 
 declare global {
@@ -6,11 +8,11 @@ declare global {
         date_created: Date;
         name: string;
         ver: string;
-        bm1: string;
-        bm2: string;
-        bm3: string;
+        author: uuid;
+        key_proportions: string;
+        servings: number;
         must_items: number[];
-        body: string;
+        body: string[];
         tags?: string[];
     }
 }
