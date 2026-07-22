@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import '../styles/AddRecipe.css'
 // import { useEffect } from "react";
-// import { supabase } from "../lib/supabase";
 import TagBox from './TagBox';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from "react-router-dom";

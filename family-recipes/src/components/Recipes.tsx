@@ -46,7 +46,7 @@ export default function Recipes() {
                     ? recipes.map((recipe) => (
                         <RecipeCard recipe={recipe}  />
                     ))
-                    : (<p>No recipes in database"</p>)
+                    : (<p>No recipes in database</p>)
             }
         </div>
     </>
