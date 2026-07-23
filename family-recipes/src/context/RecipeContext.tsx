@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabase";
 type RecipeContextType = {
     allRecipes: Recipe[];
     getAllRecipes: () => Promise<void>;
-    addRecipeDB: (value: Recipe) => Promise<void>;
+    addRecipeDB: (value: Recipe) => boolean;
     rmRecipeDB: (value: Recipe) => Promise<void>;
     editRecipeDB: (value: Recipe) => Promise<void>;
 }
@@ -30,7 +30,6 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
     }
 
     async function addRecipeDB(newRecipe: Recipe) {
-        if (!user) return;
         // insert recipe
         const { data, error } = await supabase
             .from("recipes")
@@ -41,14 +40,11 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
                 key_proportions: newRecipe.key_proportions,
                 must_items: newRecipe.must_items,
                 servings: newRecipe.servings,
-                author: user.id
+                author: newRecipe.author
             })
             .select()
             .single();
-        if (error || !data) {
-            throw Error("Error inserting new recipe into database, aborting rest of function");
-            return;
-        }
+        if (error || !data) return false;
         // insert tags (if there are any)
         if (newRecipe.tags) {
             const rid = data.recipe_id;
@@ -59,9 +55,10 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
             const { error: tagError } = await supabase
                 .from("tags")
                 .insert(tagRows);
-            if (tagError) throw Error("Error inserting tags");
+            if (tagError) return false;
         }
         setAllRecipes((prev) => [...prev, newRecipe]);
+        return true;
     }
 
     async function rmRecipeDB(rmRecipe: Recipe) {

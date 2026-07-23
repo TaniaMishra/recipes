@@ -1,0 +1,69 @@
+.add_card {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    align-self: center;
+}
+
+.add_form {
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 5px 15px;
+}
+
+.add_form_section {
+    margin: 10px;
+    display: flex;
+}
+.add_form_title {
+    width: 20%;
+}
+.add_text_input {
+    width: 50%;
+    margin: 0 2%;
+}
+
+.servings_section {
+    width: 50%;
+    margin: 0 2%;
+    display: flex;
+}
+.number_input {
+    width: 10%;
+    margin: 0 2%;
+}
+
+.steps_section {
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.steps_title {
+    width: 20%;
+    align-self: center;
+    margin-top: 5px;
+}
+.step_box {
+    margin: 3px;
+}
+.step_input {
+    width: 70%;
+    margin: 0 2%;
+}
+
+.tags_section {
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.tags_title {
+    width: 20%;
+    align-self: center;
+}
+
+.submit_section {
+    margin: 2%;
+}
+.form_btn {
+    margin: 0 1%;
+}

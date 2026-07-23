@@ -1,6 +1,7 @@
 import CreatableSelect from 'react-select/creatable';
 import { useEffect, useState } from "react";
 import { supabase } from '../lib/supabase';
+import '../styles/TagBox.css';
 
 type TagOption = {
     value: string;
@@ -48,6 +49,7 @@ export default function TagBox({ selectedTags, setSelectedTags }: TagBoxProps) {
             options={allTags}
             value={selectedOptions}
             onChange={handleChange}
+            className='tag_box'
         />
     );
 }

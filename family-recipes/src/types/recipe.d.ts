@@ -1,14 +1,12 @@
-import { uuid } from "./uuid";
-
 export {};
 
 declare global {
     interface Recipe {
         recipe_id: number;
-        date_created: Date;
+        date_created?: Date;
         name: string;
         ver: string;
-        author: uuid;
+        author: string;
         key_proportions: string;
         servings: number;
         must_items: number[];

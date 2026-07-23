@@ -13,6 +13,7 @@ import CreateUser from './components/CreateUser';
 import ViewRecipe from './components/ViewRecipe';
 import { KitchenProvider } from './context/KitchenContext';
 import { GroceryListProvider } from './context/GroceryListContext';
+import { RecipeProvider } from './context/RecipeContext';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
     <BrowserRouter>
       <KitchenProvider>
       <GroceryListProvider>
+      <RecipeProvider>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -49,6 +51,7 @@ function App() {
         <Route path="/recipes/:recipeID" element={<ViewRecipe />} />
 
       </Routes>
+      </RecipeProvider>
       </GroceryListProvider>
       </KitchenProvider>
     </BrowserRouter>
