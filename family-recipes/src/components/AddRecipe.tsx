@@ -21,10 +21,12 @@ export default function AddRecipe() {
     const [stepsIndex, setStepsIndex] = useState<number>(0);
     const stepsMaxIndex = 30;
 
+    const [tryAgain, setTryAgain] = useState<boolean>(false);
+
     const handleBodyChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const updatedBody = [...body];
         updatedBody[index] = e.target.value;
-        setBody(updatedBody);
+        setBody([...updatedBody]);
     }
     const handleStepPlus = () => {
         console.log(stepsIndex);
@@ -39,7 +41,7 @@ export default function AddRecipe() {
         // name (not null)
         if (name.length === 0) return false;
         // body (at least one step that is not blank)
-        if (body.length === 0 || !body.some((stp) => stp.length !== 0)) return false;
+        if (body.length === 0 || !body.some((stp) => stp && stp.length > 0)) return false;
         // recipe id & date created (automatically added in supabase)
         return true;
     }
@@ -63,11 +65,13 @@ export default function AddRecipe() {
     const handleSubmitOne = async() => {
         if (!validateRecipe()) {
             console.log("RECIPE INVALID, DID NOT INSERT");
+            setTryAgain(true);
             return;
         }
         const result = await insertRecipe();
         if (!result) {
             console.log("ERROR IN INSERTING RECIPE");
+            setTryAgain(true);
             return;
         }
         nav('/recipes');
@@ -75,11 +79,13 @@ export default function AddRecipe() {
     const handleSubmitMore = async() => {
         if (!validateRecipe()) {
             console.log("RECIPE INVALID, DID NOT INSERT");
+            setTryAgain(true);
             return;
         }
         const result = await insertRecipe();
         if (!result) {
             console.log("ERROR IN INSERTING RECIPE");
+            setTryAgain(true);
             return;
         }
         setName("");
@@ -90,6 +96,7 @@ export default function AddRecipe() {
         setSelectedTags([]);
         setSvngs(0);
         setStepsIndex(0);
+        setTryAgain(false);
     }
 
   return (
@@ -143,7 +150,7 @@ export default function AddRecipe() {
                         (Array.from({ length: (stepsIndex+1) }).map((_, i) => 
                             (<div className='step_box' key={i}>
                                 <input type="text"
-                                    value={body[i]}
+                                    value={body[i] || ""}
                                     onChange={(e) => handleBodyChange(e, i)}
                                     placeholder="Enter step instructions"
                                     className="step_input"
@@ -167,6 +174,10 @@ export default function AddRecipe() {
                     <button onClick={handleSubmitOne} className='form_btn'>Submit Recipe</button>
                     <button onClick={handleSubmitMore} className='form_btn'>Submit Recipe & Add Another</button>
                 </div>
+                {tryAgain ?
+                    <p>The recipe unable to be added. A name and at least 1 non-empty step is required to add a recipe. Make sure you have the required elements before trying again.</p>
+                    : <></>
+                }
             </div>
         </div>
     </>
