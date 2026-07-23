@@ -43,12 +43,15 @@ export default function AddRecipe() {
         // body (at least one step that is not blank)
         if (body.length === 0 || !body.some((stp) => stp && stp.length > 0)) return false;
         // recipe id & date created (automatically added in supabase)
+        console.log("tags:", selectedTags);
         return true;
     }
 
     const insertRecipe = async() => {
-        console.log("submitted");
-        if (!user) return;
+        if (!user) return false;
+        const formatted_tags = selectedTags.map((tag) => ({
+                desc: tag
+            }));
         const result = addRecipeDB({
             recipe_id: -55,
             name: name,
@@ -57,6 +60,7 @@ export default function AddRecipe() {
             key_proportions: keyProps || "",
             must_items: musts,
             servings: svngs || 0,
+            tags: formatted_tags,
             author: user.id
         });
         return result;

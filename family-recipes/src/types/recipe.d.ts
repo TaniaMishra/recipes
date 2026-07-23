@@ -11,6 +11,6 @@ declare global {
         servings: number;
         must_items: number[];
         body: string[];
-        tags?: string[];
+        tags?: tag[];
     }
 }

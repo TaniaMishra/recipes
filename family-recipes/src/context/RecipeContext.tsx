@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabase";
 type RecipeContextType = {
     allRecipes: Recipe[];
     getAllRecipes: () => Promise<void>;
-    addRecipeDB: (value: Recipe) => boolean;
+    addRecipeDB: (value: Recipe) => Promise<boolean>;
     rmRecipeDB: (value: Recipe) => Promise<void>;
     editRecipeDB: (value: Recipe) => Promise<void>;
 }
@@ -23,9 +23,11 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
             .from("recipes")
             .select(`
                 *,
-                tags (desc)    
+                tags (tag_id, recipe_id, desc)    
             `);
         if (error) throw Error("Error occured while fetching all recipes and associated tags");
+        // const recipeList = data as Recipe[];
+        // console.log(recipeList);
         setAllRecipes(data as Recipe[]);
     }
 
@@ -45,19 +47,22 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
             .select()
             .single();
         if (error || !data) return false;
+        const rid = data.recipe_id;
+        const updatedRecipe = newRecipe;
+        updatedRecipe.recipe_id = rid;
         // insert tags (if there are any)
         if (newRecipe.tags) {
-            const rid = data.recipe_id;
             const tagRows = newRecipe.tags.map((tag) => ({
                 recipe_id: rid,
-                desc: tag
+                desc: tag.desc
             }));
             const { error: tagError } = await supabase
                 .from("tags")
-                .insert(tagRows);
+                .insert(tagRows)
+                .select();
             if (tagError) return false;
         }
-        setAllRecipes((prev) => [...prev, newRecipe]);
+        setAllRecipes((prev) => [...prev, updatedRecipe]);
         return true;
     }
 
