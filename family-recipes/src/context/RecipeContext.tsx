@@ -103,7 +103,7 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
                 getAllRecipes,
                 addRecipeDB,
                 rmRecipeDB,
-                editRecipeDB
+                editRecipeDB,
             }}
         >
             {children}
