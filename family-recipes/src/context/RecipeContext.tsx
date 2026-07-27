@@ -72,6 +72,23 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
                 .select();
             if (tagError) return false;
         }
+        // insert subs (if there are any)
+        if (newRecipe.subs) {
+            const subRows = newRecipe.subs.map((subItm) => ({
+                recipe_id: rid,
+                ingredient: subItm.ingredient,
+                sub: subItm.sub
+            }));
+            console.log("sub rows: ", subRows);
+            const { error: subError } = await supabase
+                .from("substitutions")
+                .insert(subRows)
+                .select();
+            if (subError) {
+                console.log("error with adding subs")
+                return false;
+            }
+        }
         setAllRecipes((prev) => [...prev, updatedRecipe]);
         return true;
     }

@@ -12,5 +12,6 @@ declare global {
         must_items: number[];
         body: string[];
         tags?: tag[];
+        subs?: sub[];
     }
 }
