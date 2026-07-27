@@ -1,19 +1,24 @@
-import React, { useState } from 'react'
-import '../styles/AddRecipe.css'
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useState, useEffect } from 'react'
+import '../styles/EditRecipe.css'
 import TagBox from './TagBox';
 import { useNavigate } from "react-router-dom";
 import { useRecipe } from '../context/RecipeContext';
 import { useAuth } from '../context/useAuth';
+import { useParams } from 'react-router-dom';
 
+// TODO: button to delete recipe
+// TODO: handle update to tags
+// TODO: handle updates to ingredients (if body changes), substitutions, and must haves
 
-// TODO: ingredients: parse from body, add to db
-// TODO: must have items
-// TODO: substitutions
-
-export default function AddRecipe() {
-    const nav = useNavigate();
-    const { validateRecipe, addRecipeDB } = useRecipe();
+export default function EditRecipe() {
+    const { recipeID } = useParams();
     const { user } = useAuth();
+    const nav = useNavigate();
+    const { allRecipes, getAllRecipes, validateRecipe, editRecipeDB } = useRecipe();
+
+    const [author, setAuthor] = useState<string>("");
+    const [id, setId] = useState<number>(-1);
 
     const [name, setName] = useState<string>("");
     const [ver, setVer] = useState<string>("");
@@ -27,6 +32,32 @@ export default function AddRecipe() {
     const stepsMaxIndex = 30;
 
     const [tryAgain, setTryAgain] = useState<boolean>(false);
+    
+    useEffect(() => {
+        if (!recipeID) {
+            nav('/recipes');
+            return;
+        }
+        if (allRecipes.length === 0) {
+            getAllRecipes();
+            return;
+        }
+        const rid = parseInt(recipeID);
+        const recipe = allRecipes.find((r) => r.recipe_id === rid);
+        if (!recipe) return;
+     
+        setAuthor(recipe.author);
+        setId(recipe.recipe_id);
+        setName(recipe.name);
+        setVer(recipe.ver);
+        setMusts(recipe.must_items);
+        setBody(recipe.body);
+        setKeyProps(recipe.key_proportions);
+        setSvngs(recipe.servings);
+        setSelectedTags(recipe.tags?.map((t) => t.desc) ?? []);
+        setStepsIndex(recipe.body.length - 1);
+    }, [recipeID, allRecipes, getAllRecipes]);
+
 
     const handleBodyChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const updatedBody = [...body];
@@ -40,13 +71,13 @@ export default function AddRecipe() {
         }
     }
 
-    const insertRecipe = async() => {
-        if (!user) return false;
+    const updateRecipe = async() => {
+        if (!user || user.id !== author) return false;
         const formatted_tags = selectedTags.map((tag) => ({
                 desc: tag
             }));
-        const result = await addRecipeDB({
-            recipe_id: -55,
+        const result = await editRecipeDB({
+            recipe_id: id,
             name: name,
             ver: ver,
             body: body,
@@ -54,82 +85,60 @@ export default function AddRecipe() {
             must_items: musts,
             servings: svngs || 0,
             tags: formatted_tags,
-            author: user.id
+            author: author
         });
         return result;
     }
 
-    const handleSubmitOne = async() => {
+    const handleSubmit = async() => {
         if (!validateRecipe(name, body)) {
-            console.log("RECIPE INVALID, DID NOT INSERT");
+            console.log("RECIPE INVALID, DID NOT UPDATE");
             setTryAgain(true);
             return;
         }
-        const result = await insertRecipe();
+        const result = await updateRecipe();
         if (!result) {
-            console.log("ERROR IN INSERTING RECIPE");
+            console.log("ERROR IN UPDATING RECIPE");
             setTryAgain(true);
             return;
         }
-        nav('/recipes');
-    }
-    const handleSubmitMore = async() => {
-        if (!validateRecipe(name, body)) {
-            console.log("RECIPE INVALID, DID NOT INSERT");
-            setTryAgain(true);
-            return;
-        }
-        const result = await insertRecipe();
-        if (!result) {
-            console.log("ERROR IN INSERTING RECIPE");
-            setTryAgain(true);
-            return;
-        }
-        setName("");
-        setBody([]);
-        setVer("");
-        setKeyProps("");
-        setMusts([]);
-        setSelectedTags([]);
-        setSvngs(0);
-        setStepsIndex(0);
-        setTryAgain(false);
+        nav(`/recipes/${id}`);
     }
 
   return (
     <>
-        <div className="add_card">
-            <h1>Add Recipe</h1>
-            <div className='add_form'>
-                <div className='add_form_section'>
-                    <p className='add_form_title'>Recipe Name</p>
+        <div className="edit_card">
+            <h1>Edit Recipe</h1>
+            <div className='edit_form'>
+                <div className='edit_form_section'>
+                    <p className='edit_form_title'>Recipe Name</p>
                     <input type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Recipe Name"
-                        className="add_text_input"
+                        className="edit_text_input"
                     />
                 </div>
-                <div className='add_form_section'>
-                    <p className='add_form_title'>Version</p>
+                <div className='edit_form_section'>
+                    <p className='edit_form_title'>Version</p>
                     <input type="text"
                         value={ver}
                         onChange={(e) => setVer(e.target.value)}
                         placeholder="Version"
-                        className="add_text_input"
+                        className="edit_text_input"
                     />
                 </div>
-                <div className='add_form_section'>
-                    <p className='add_form_title'>Key Proportions</p>
+                <div className='edit_form_section'>
+                    <p className='edit_form_title'>Key Proportions</p>
                     <input type="text"
                         value={keyProps}
                         onChange={(e) => setKeyProps(e.target.value)}
                         placeholder="Key Proportions"
-                        className="add_text_input"
+                        className="edit_text_input"
                     />
                 </div>
-                <div className='add_form_section'>
-                    <p className='add_form_title'>Servings</p>
+                <div className='edit_form_section'>
+                    <p className='edit_form_title'>Servings</p>
                     <div className='servings_section'>
                         <p>This recipe makes</p>
                         <input type="number"
@@ -168,11 +177,10 @@ export default function AddRecipe() {
                     />
                 </div>
                 <div className='submit_section'>
-                    <button onClick={handleSubmitOne} className='form_btn'>Submit Recipe</button>
-                    <button onClick={handleSubmitMore} className='form_btn'>Submit Recipe & Add Another</button>
+                    <button onClick={handleSubmit} className='form_btn'>Update Recipe</button>
                 </div>
                 {tryAgain ?
-                    <p>The recipe is unable to be added. A name and at least 1 non-empty step is required to add a recipe. Make sure you have the required elements before trying again.</p>
+                    <p>The recipe is unable to be updated. A name and at least 1 non-empty step is required to add a recipe. Make sure you have the required elements before trying again.</p>
                     : <></>
                 }
             </div>

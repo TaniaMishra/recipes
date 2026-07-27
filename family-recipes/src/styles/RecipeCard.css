@@ -8,6 +8,10 @@
     text-decoration: none;
     border-radius: 5px;
     border: 2px solid var(--accent-border);
-    transition: border-color 0.3s;
     background-color: var(--accent-bg);
+}
+
+.recipe_tags {
+    display: flex;
+    align-self: center;
 }

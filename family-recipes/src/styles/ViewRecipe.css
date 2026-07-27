@@ -1,13 +1,40 @@
 .recipe {
+    width: 95%;
     display: flex;
     flex-flow: column;
+    align-self: center;
+}
+
+.recipe_heading {
+    align-self: center;
+    align-items: center;
+}
+
+
+.tag_lst {
+    padding: 0;
+    margin: 0;
+
+}
+.tag {
+    list-style-type: none;
+    display: inline;
+}
+
+
+.body_box {
     margin: 5%;
     margin-top: 15px;
-    width: 90%;
+    width: 70%;
+    align-self: center;
     color: var(--text);
-    text-decoration: none;
     border-radius: 5px;
     border: 2px solid var(--accent-border);
-    transition: border-color 0.3s;
     background-color: var(--accent-bg);
+    display: flex;
+}
+
+.edit_btn {
+    width: 20%;
+    align-self: center;
 }

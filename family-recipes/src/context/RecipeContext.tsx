@@ -5,9 +5,10 @@ import { supabase } from "../lib/supabase";
 type RecipeContextType = {
     allRecipes: Recipe[];
     getAllRecipes: () => Promise<void>;
+    validateRecipe: (arg0: string, arg1: string[]) => boolean;
     addRecipeDB: (value: Recipe) => Promise<boolean>;
     rmRecipeDB: (value: Recipe) => Promise<void>;
-    editRecipeDB: (value: Recipe) => Promise<void>;
+    editRecipeDB: (value: Recipe) => Promise<boolean>;
 }
 
 const RecipeContext = createContext<RecipeContextType | null>(null);
@@ -16,6 +17,17 @@ const RecipeContext = createContext<RecipeContextType | null>(null);
 export function RecipeProvider({ children } : { children: React.ReactNode; }) {
     const { user } = useAuth();
     const [allRecipes, setAllRecipes] = useState<Recipe[]>([]);
+
+    function validateRecipe(name: string, body: string[]) {
+        // author (user logged in)
+        if (!user) return false;
+        // name (not null)
+        if (name.length === 0) return false;
+        // body (at least one step that is not blank)
+        if (body.length === 0 || !body.some((stp) => stp && stp.length > 0)) return false;
+        // recipe id & date created (automatically added in supabase)
+        return true;
+    }
 
     async function getAllRecipes() {
         // get all recipes, return null if select fails
@@ -26,8 +38,6 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
                 tags (tag_id, recipe_id, desc)    
             `);
         if (error) throw Error("Error occured while fetching all recipes and associated tags");
-        // const recipeList = data as Recipe[];
-        // console.log(recipeList);
         setAllRecipes(data as Recipe[]);
     }
 
@@ -77,8 +87,14 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
     }
 
     async function editRecipeDB(newRecipe: Recipe) {
-        if (!user) return;
-        const { error } = await supabase
+        console.log("new recipe: ", newRecipe);
+        const { data: existing } = await supabase
+            .from("recipes")
+            .select("recipe_id, author")
+            .eq("recipe_id", newRecipe.recipe_id);
+            console.log(existing);
+
+        const { data, error } = await supabase
             .from("recipes")
             .update({
                 name: newRecipe.name,
@@ -87,13 +103,20 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
                 key_proportions: newRecipe.key_proportions,
                 must_items: newRecipe.must_items,
                 servings: newRecipe.servings,
-                author: user.id
             })
-            .eq('recipe_id', newRecipe.recipe_id);
-        if (error) throw Error("Error updating recipe");
+            .eq('recipe_id', newRecipe.recipe_id)
+            .select();
+        if (error || !data) {
+            console.log("error", error);
+            return false;
+        }
+        console.log("data from update", data);
+        // TODO: handle tag updates
         // remove old version of recipe, add new version
         const unchangedRecipes = allRecipes.filter((rec) => rec.recipe_id !== newRecipe.recipe_id);
         setAllRecipes([...unchangedRecipes, newRecipe]);
+        console.log("returning true");
+        return true;
     }
 
     return (
@@ -101,9 +124,10 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
             value = {{
                 allRecipes,
                 getAllRecipes,
+                validateRecipe,
                 addRecipeDB,
                 rmRecipeDB,
-                editRecipeDB,
+                editRecipeDB
             }}
         >
             {children}
