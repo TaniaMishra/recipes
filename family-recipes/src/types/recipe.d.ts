@@ -10,8 +10,9 @@ declare global {
         key_proportions: string;
         servings: number;
         must_items: number[];
+        gen_items: number[];
         body: string[];
-        tags?: tag[];
-        subs?: sub[];
+        tags?: Tag[];
+        substitutions?: Sub[];
     }
 }

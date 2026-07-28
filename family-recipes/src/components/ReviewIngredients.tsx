@@ -1,21 +1,15 @@
 import '../styles/ReviewIngredients.css'
 // import { useState } from 'react';
 
-type Ingredient = {
-    item: string;
-    item_id: number;
-    must: boolean;
-    sub: string;
-}
-
 interface ReviewIngredientsProps {
     ingredients: Ingredient[];
     setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>;
+    reParse: () => Ingredient[];
 }
 
 // TODO: be able to search for and add ingredients not listed
 
-export default function ReviewIngredients({ingredients, setIngredients}: ReviewIngredientsProps) {
+export default function ReviewIngredients({ingredients, setIngredients, reParse}: ReviewIngredientsProps) {
     // const [addIngModal, setAddIngModal] = useState<boolean>(false);
 
     const handleCheckChange = (checked: boolean, id: number) => {
@@ -41,11 +35,16 @@ export default function ReviewIngredients({ingredients, setIngredients}: ReviewI
         setIngredients([...updatedIngredients]);
     }
     
+    const handleReloadIngredients = () => {
+        const ings = reParse();
+        setIngredients(ings);
+    }
 
   return (
     <>
         <div className="review_card">
             <h1>Review Ingredients</h1>
+            <button onClick={handleReloadIngredients}>Reload ingredients?</button>
             <table className='ing_table'>
                 <thead>
                     <tr>
@@ -74,7 +73,7 @@ export default function ReviewIngredients({ingredients, setIngredients}: ReviewI
                                         className='sub_textbox'
                                     />
                                 </td>
-                                {/* make delete button a trash can */}
+                                {/* TODO: make delete button a trash can */}
                                 <td>
                                     <input type="button"
                                         onClick={() => handleDelete(ing.item_id)}
@@ -90,7 +89,7 @@ export default function ReviewIngredients({ingredients, setIngredients}: ReviewI
                 </tbody>
             </table>
             {/* {addIngModal ? 
-            // ADD INGREDIENT MODAL
+            // TODO: ADD INGREDIENT MODAL
             : <button onClick={}>Add Ingredient</button>} */}
         </div>
     </>

@@ -59,7 +59,6 @@ export function GroceryListProvider({ children } : { children: React.ReactNode; 
             .in("item_id", groc_list);
         if (error) throw Error("Error occured while fetching grocery list from kitchen table");
         // update state
-        setGrocListDirty(true);
         setGrocListItems(data);
     }
 

@@ -1,7 +1,7 @@
 export {};
 
 declare global {
-    interface Item {
+    interface Sub {
         sub_id: number;
         recipe_id: number;
         ingredient: number;

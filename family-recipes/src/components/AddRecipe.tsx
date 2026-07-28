@@ -7,19 +7,9 @@ import { useAuth } from '../context/useAuth';
 import { useKitchen } from '../context/KitchenContext';
 import ReviewIngredients from './ReviewIngredients';
 
-// TODO: substitutions
-
-// TODO: how to handle duplicate items in different categories?
-type Ingredient = {
-    item: string;
-    item_id: number;
-    must: boolean;
-    sub: string;
-}
-
 export default function AddRecipe() {
     const nav = useNavigate();
-    const { validateRecipe, addRecipeDB } = useRecipe();
+    const { validateRecipe, addRecipeDB, parseIngredientsFromRecipe } = useRecipe();
     const { user } = useAuth();
     const { allItems, fetchAllitems } = useKitchen();
 
@@ -34,7 +24,6 @@ export default function AddRecipe() {
     const stepsMaxIndex = 30;
 
     const [tryAgain, setTryAgain] = useState<boolean>(false);
-
     
     const [reviewIngModal, setReviewIngModal] = useState<boolean>(false);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -49,30 +38,14 @@ export default function AddRecipe() {
         setBody([...updatedBody]);
     }
     const handleStepPlus = () => {
-        console.log(stepsIndex);
         if (stepsIndex < stepsMaxIndex) {
             setStepsIndex((prev) => (prev + 1));
         }
     }
 
-    // TODO: parse from key proportions
-    // TODO: remove duplicate items
-    // TODO: handle duplicate items in different categories
-    const parseIngredients = () => {
-        const ings = [] as Ingredient[];
-        const consolidatedBody = keyProps + " " + body.join(" ").toLowerCase();
-        allItems.forEach((itm) => {
-            if (consolidatedBody.includes(itm.item.toLowerCase())) {
-                ings.push({
-                    item: itm.item,
-                    item_id: itm.item_id,
-                    must: false,
-                    sub: ""
-                })
-            }
-        });
-        console.log(ings);
-        setIngredients([...ings]);
+    const reParseIngredients = () => {
+        const ings = parseIngredientsFromRecipe(keyProps, body);
+        return ings;
     }
 
     const handleReview = () => {
@@ -81,7 +54,8 @@ export default function AddRecipe() {
             setTryAgain(true);
             return;
         }
-        parseIngredients();
+        const ings = parseIngredientsFromRecipe(keyProps, body);
+        setIngredients(ings);
         setReviewIngModal(true);
         setTryAgain(false);
     }
@@ -89,12 +63,13 @@ export default function AddRecipe() {
     const insertRecipe = async() => {
         if (!user) return false;
         const formatted_tags = selectedTags.map((tag) => (
-            { desc: tag }
+            { tag_id: -55, recipe_id: -55, desc: tag }
         ));
         const formatted_subs = ingredients.filter((ing) => ing.sub.length > 0).map((ing) => (
-            { ingredient: ing.item_id, sub: ing.sub }
+            { sub_id: -55, recipe_id: -55, ingredient: ing.item_id, sub: ing.sub }
         ))
         const formatted_musts = ingredients.filter((ing) => ing.must).map((ing) => ing.item_id);
+        const formatted_gen_items = ingredients.filter((ing) => !ing.must).map((ing) => ing.item_id);
         const result = await addRecipeDB({
             recipe_id: -55,
             name: name,
@@ -102,9 +77,10 @@ export default function AddRecipe() {
             body: body,
             key_proportions: keyProps || "",
             must_items: formatted_musts,
+            gen_items: formatted_gen_items,
             servings: svngs || 0,
             tags: formatted_tags,
-            subs: formatted_subs,
+            substitutions: formatted_subs,
             author: user.id
         });
         return result;
@@ -219,7 +195,7 @@ export default function AddRecipe() {
                         setSelectedTags = {setSelectedTags}
                     />
                 </div>
-                {reviewIngModal ? <ReviewIngredients ingredients={ingredients} setIngredients={setIngredients}/> : <></>}
+                {reviewIngModal ? <ReviewIngredients ingredients={ingredients} setIngredients={setIngredients} reParse={reParseIngredients}/> : <></>}
                 <div className='submit_section'>
                     {reviewIngModal
                         ? (<div>
