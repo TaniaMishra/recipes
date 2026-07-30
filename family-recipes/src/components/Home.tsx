@@ -1,34 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import '../styles/Home.css'
-import { SearchBox } from './SearchBox'
-import { RecipeCard } from './RecipeCard';
-import { useEffect } from "react";
-import { supabase } from "../lib/supabase";
-// import homeIcon from "../assets/home-icon.jpg"
-
+import SearchBox from './SearchBox'
+import SearchRecipeResults from './SearchRecipeResults';
+import { useRecipe } from '../context/RecipeContext';
 
 export default function Home() {
-    const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const {allRecipes, getAllRecipes} = useRecipe();
+        
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(true);
+    const [filterPreset, setFilterPreset] = useState<number>(-1);
     const [showResults, setShowResults] = useState<boolean>(false);
 
     useEffect(() => {
-        async function fetchRecipes() {
-            setLoading(true);
-            const { data, error } = await supabase
-                .from("recipes")
-                .select("*");
-            if (error) {
-                console.log("ERROR FETCHING RECIPES", error)
-            } else if (data) {
-                setRecipes(data as Recipe[])
-            }
-            setLoading(false)
-        }
-        fetchRecipes();
-    }, []);
-
+        if (allRecipes.length === 0) getAllRecipes();
+    }, [allRecipes, getAllRecipes]);
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);
@@ -39,11 +24,10 @@ export default function Home() {
         }
     }
 
-    // TO DO: advanced searches
-    // currently filtering based on the search words being part of the name of the recipe
-    const filteredRecipes = recipes.filter((recipe) =>
-        recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const handleFilter = (preset: number) => {
+        setFilterPreset(preset);
+        setShowResults(true)
+    }
 
   return (
     <>
@@ -64,18 +48,7 @@ export default function Home() {
             <p className='separator'>&middot;</p>
             <p className='filter'>filter placeholder</p>
         </div>
-        <div className='recipe_list'>
-            {showResults ?
-                loading ? 
-                    (<p>Loading recipes...</p>)
-                    : filteredRecipes.length > 0
-                        ? filteredRecipes.map((recipe) => (
-                            <RecipeCard recipe={recipe}  />
-                        ))
-                        : (<p>No recipes found matching "{searchQuery}"</p>)
-                : <p>Search or filter to view results</p>
-            }
-        </div>
+        <SearchRecipeResults query={searchQuery} showResults={showResults}/>
     </>
   )
 }

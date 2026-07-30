@@ -237,16 +237,20 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
         return true;
     }
 
-    // TODO: remove duplicate items
-    // TODO: handle duplicate items in different categories
-    // TODO: BUG: "rice flour" ends up being put in as a "rice" ingredient and "rice flour" ingredient
     // TODO: how to handle duplicate items in different categories?
     // (ex. bread in freezer vs bread in pantry - both show up as ingredients)
     const parseIngredientsFromRecipe = (keyProps: string, body: string[]) => {
         const ings = [] as Ingredient[];
-        const consolidatedBody = keyProps + " " + body.join(" ").toLowerCase();
-        allItems.forEach((itm) => {
-            if (consolidatedBody.includes(itm.item.toLowerCase())) {
+        let consolidatedBody = keyProps + " " + body.join(" ").toLowerCase();
+        // sort items by length (longest to shortest)
+        const itemsByLength = [...allItems].sort((a, b) => b.item.length - a.item.length);
+        for (const itm of itemsByLength) {
+            // replace special characters in the item name with its escaped version
+            const escapeSpecChars = itm.item.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            // create expression of item name using word breaks (search globally, case insensitive)
+            const regex = new RegExp(`\\b${escapeSpecChars}\\b`, 'gi');
+            // check if expression is present in consolidated body text, add ingredient if it is
+            if (regex.test(consolidatedBody)) {
                 ings.push({
                     item: itm.item,
                     item_id: itm.item_id,
@@ -254,7 +258,9 @@ export function RecipeProvider({ children } : { children: React.ReactNode; }) {
                     sub: ""
                 })
             }
-        });
+            // remove all instances of the expression in the body to avoid future partial matches
+            consolidatedBody = consolidatedBody.replace(regex, "");
+        }
         return ings;
     }
 

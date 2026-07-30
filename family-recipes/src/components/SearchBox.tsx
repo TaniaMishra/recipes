@@ -5,7 +5,7 @@ interface SearchBoxProps {
     onSearch: (query: string) => void;
     placeholder?: string;
 }
-export function SearchBox({onSearch, placeholder = "Search..."}: SearchBoxProps) {
+export default function SearchBox({onSearch, placeholder = "Search..."}: SearchBoxProps) {
     const [query, setQuery] = useState<string>("");
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
