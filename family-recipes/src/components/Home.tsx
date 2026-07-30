@@ -3,12 +3,14 @@ import '../styles/Home.css'
 import SearchBox from './SearchBox'
 import SearchRecipeResults from './SearchRecipeResults';
 import { useRecipe } from '../context/RecipeContext';
+import { useAuth } from '../context/useAuth';
 
 export default function Home() {
+    const {user, userProfile} = useAuth();
     const {allRecipes, getAllRecipes} = useRecipe();
         
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [filterPreset, setFilterPreset] = useState<number>(-1);
+    const [filterSelection, setFilterSelection] = useState<string | null>(null);
     const [showResults, setShowResults] = useState<boolean>(false);
 
     useEffect(() => {
@@ -24,8 +26,8 @@ export default function Home() {
         }
     }
 
-    const handleFilter = (preset: number) => {
-        setFilterPreset(preset);
+    const handleFilter = (index: number) => {
+        setFilterSelection(userProfile?.saved_filters[index] ?? null);
         setShowResults(true)
     }
 
@@ -37,18 +39,21 @@ export default function Home() {
         <div className='search_box'>
             <SearchBox onSearch={handleSearch} placeholder='Search recipes...'/>
         </div>
-        <div className='filter_box'>
-            {/* TO DO: get filters from user profile */}
-            {/* TO DO: use map function to display filter options */}
-            {/* TO DO: search handler for using filters */}
-            {/* <img src={homeIcon} className='home_icon'/> */}
-            <p className='filter'>in my kitchen</p>
-            <p className='separator'>&middot;</p>
-            <p className='filter'>filter placeholder</p>
-            <p className='separator'>&middot;</p>
-            <p className='filter'>filter placeholder</p>
-        </div>
-        <SearchRecipeResults query={searchQuery} showResults={showResults}/>
+        {userProfile && userProfile.saved_filters
+            ? <div className='filter_box'>
+                {userProfile.saved_filters.map((filter, index) => (<>
+                    {index > 0 ? <p className='separator'>&middot;</p> : <></>}
+                    <p className='filter' key={index} onClick={() => handleFilter(index)}>{filter}</p>
+                </>))}
+                {/* <p className='filter'>in my kitchen</p>
+                <p className='separator'>&middot;</p>
+                <p className='filter'>filter placeholder</p>
+                <p className='separator'>&middot;</p>
+                <p className='filter'>filter placeholder</p> */}
+            </div>
+            : <></>
+        }
+        <SearchRecipeResults query={searchQuery} filter={filterSelection} showResults={showResults}/>
     </>
   )
 }

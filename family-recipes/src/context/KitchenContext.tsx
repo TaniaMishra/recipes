@@ -22,7 +22,7 @@ const KitchenContext = createContext<KitchenContextType | null>(null);
 
 
 export function KitchenProvider({ children } : { children: React.ReactNode }) {
-    const { user } = useAuth();
+    const { user, userProfile } = useAuth();
     const [dirty, setDirty] = useState(false);
     const [maxRows, setMaxRows] = useState<number>(0);
     const ctgTitles = ["Produce", "Non-Produce Fridge", "Pantry", "Frozen", "Condiments", "Spices"];
@@ -59,16 +59,9 @@ export function KitchenProvider({ children } : { children: React.ReactNode }) {
 
     type ItemStatus = "have_items" | "low_items" | "out_items";
     async function getKitchenItems(status: ItemStatus) {
-        if (!user) return null;
-        // get list of item ids for have, low, and out for logged in user, return null if select fails
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("have_items, low_items, out_items")
-          .eq("id", user.id)
-          .single();
-        if (profileError || !profile) return null;
+        if (!userProfile) return null;
         // get kitchen items that match the status list of ids, return null if select fails
-        const ids = profile[status] ?? [];
+        const ids = userProfile[status];
         const { data, error } = await supabase
             .from("kitchen")
             .select("*")

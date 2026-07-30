@@ -8,6 +8,11 @@ interface ModalProps {
     onClose: () => void;
 }
 
+// TODO: "did you mean __?"
+    // rice (pantry) --> "did you mean Rice (pantry)?"
+    // Rice (freezer) --> "did you mean Rice (pantry)?"
+    // Banana (produce) --> "did you mean Bananas (produce)?"
+
 export default function AddItemModal({ onClose }: ModalProps) {
     const { user } = useAuth();
     const { ctgTitles, allItems, setAllItems, kitchenItemsByCat, setKitchenItemsByCat, setDirty } = useKitchen();

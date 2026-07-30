@@ -4,12 +4,14 @@ import { useRecipe } from '../context/RecipeContext';
 
 interface SearchRecipeResultsProps {
     query: string;
+    filter: string;
     showResults: boolean;
 }
 
-export default function SearchRecipeResults({ query, showResults }: SearchRecipeResultsProps) {
+export default function SearchRecipeResults({ query, filter, showResults }: SearchRecipeResultsProps) {
     const {allRecipes} = useRecipe();
-
+    console.log("search query:", query);
+    console.log("filter:", filter);
     // TO DO: advanced searches
     // currently filtering based on the search words being part of the name of the recipe
     const filteredRecipes = allRecipes.filter((rec) =>
