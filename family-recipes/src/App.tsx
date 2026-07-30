@@ -11,8 +11,10 @@ import Profile from './components/Profile';
 import Login from './components/Login';
 import CreateUser from './components/CreateUser';
 import ViewRecipe from './components/ViewRecipe';
+import EditRecipe from './components/EditRecipe';
 import { KitchenProvider } from './context/KitchenContext';
 import { GroceryListProvider } from './context/GroceryListContext';
+import { RecipeProvider } from './context/RecipeContext';
 
 function App() {
 
@@ -20,6 +22,7 @@ function App() {
     <BrowserRouter>
       <KitchenProvider>
       <GroceryListProvider>
+      <RecipeProvider>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -47,8 +50,13 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/create-account" element={<CreateUser />} />
         <Route path="/recipes/:recipeID" element={<ViewRecipe />} />
-
+        <Route path="/edit-recipe/:recipeID" element={
+          <ProtectedRoute>
+            <EditRecipe />
+          </ProtectedRoute>
+          }/>
       </Routes>
+      </RecipeProvider>
       </GroceryListProvider>
       </KitchenProvider>
     </BrowserRouter>

@@ -1,24 +1,24 @@
-.add_card {
+.edit_card {
     display: flex;
     flex-direction: column;
     width: 90%;
     align-self: center;
 }
 
-.add_form {
+.edit_form {
     border: 1px solid var(--accent-border);
     border-radius: 20px;
     padding: 5px 15px;
 }
 
-.add_form_section {
+.edit_form_section {
     margin: 10px;
     display: flex;
 }
-.add_form_title {
+.edit_form_title {
     width: 20%;
 }
-.add_text_input {
+.edit_text_input {
     width: 50%;
     margin: 0 2%;
 }

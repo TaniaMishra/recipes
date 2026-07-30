@@ -3,14 +3,16 @@ export {};
 declare global {
     interface Recipe {
         recipe_id: number;
-        date_created: Date;
+        date_created?: Date;
         name: string;
         ver: string;
-        bm1: string;
-        bm2: string;
-        bm3: string;
+        author: string;
+        key_proportions: string;
+        servings: number;
         must_items: number[];
-        body: string;
-        tags?: string[];
+        gen_items: number[];
+        body: string[];
+        tags?: Tag[];
+        substitutions?: Sub[];
     }
 }

@@ -1,0 +1,9 @@
+.review_card {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}
+
+.tbl_heading {
+    width: 25%;
+}
